@@ -49,3 +49,23 @@ dependencies {
     implementation project(':camera')
     implementation 'com.android.support:recyclerview-v7:28.0.0-rc01'
 }
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.novoda:bintray-release:0.8.1'
+    }
+}
+
+apply plugin: 'com.novoda.bintray-release'
+
+publish {
+    userOrg = 'shichaohui'
+    groupId = 'com.sch.camera'
+    artifactId = 'camera-ui'
+    publishVersion = '1.0.0'
+    desc = 'Based on custom CameraManager. Support flash, focus, zoom, switch camera, photo, video, default UI, etc.'
+    website = 'https://github.com/shichaohui/Camera.git'
+}
