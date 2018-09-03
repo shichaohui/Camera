@@ -14,11 +14,11 @@
 
 ## 使用默认 UI
 
-若对 UI 没有特殊要求，可直接 [使用 camera-ui](/camera-ui/) 一键接入相机组件。
+若对 UI 没有特殊要求，可直接 [使用 camera-ui](./camera-ui/) 一键接入相机组件。
 
 ## 自定义 UI
 
-[camera API 库](/camera/) 提供上面提到的所有功能相关 API，配合自定义 UI 直接调用即可。
+[camera API 库](./camera/) 提供上面提到的所有功能相关 API，配合自定义 UI 直接调用即可。
 
 # License
 

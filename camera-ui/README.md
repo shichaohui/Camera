@@ -13,10 +13,9 @@
 
 ## 内置 UI 预览
 
-![相机预览](/Screenshots/preview.jpeg)
-![拍摄照片](/Screenshots/picture.jpeg)
-![录制视频](/Screenshots/video_record.jpeg)
-![选择结果](/Screenshots/select.jpeg)
+![单拍](./Screenshots/single_shot.gif)
+&nbsp;&nbsp;
+![多拍](./Screenshots/multi_shot.gif)
 
 ## 使用
 
@@ -56,7 +55,7 @@ options.setFlash(DefOptions.FLASH_OFF);
 
 ### 启动相机
 
-使用 [Camera.java](/src/main/java/com/sch/camera/ui/Camera.java) 类启动相机。
+使用 [Camera.java](./src/main/java/com/sch/camera/ui/Camera.java) 类启动相机。
 
 ```
 // 只拍摄一个照片/视频。
@@ -68,7 +67,7 @@ Camera.multiShot(...);
 
 ### 获取拍摄结果
 
-启动相机时传入 [Camera.Callback](/src/main/java/com/sch/camera/ui/Camera.java) 接口的实例接收拍摄结果。
+启动相机时传入 [Camera.Callback](./src/main/java/com/sch/camera/ui/Camera.java) 接口的实例接收拍摄结果。
 
 ```
 Camera.Callback callback = new Camera.Callback() {

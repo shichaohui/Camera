@@ -22,7 +22,7 @@ implementation project(':camera')
 
 ### API
 
-#### 初始化 [ICameraManager](/src/main/java/com/sch/camera/manager/ICameraManager.java)
+#### 初始化 [ICameraManager](./src/main/java/com/sch/camera/manager/ICameraManager.java)
 
 ```
 Options options = new Options();
@@ -101,7 +101,7 @@ public class CameraActivity extends Activity {
 
 #### 其他 API
 
-详见 [ICameraManager](/src/main/java/com/sch/camera/manager/ICameraManager.java) 接口。
+详见 [ICameraManager](./src/main/java/com/sch/camera/manager/ICameraManager.java) 接口。
 
 ```
 /**
