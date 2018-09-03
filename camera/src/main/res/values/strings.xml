@@ -1,0 +1,23 @@
+<!--
+  ~ Copyright (c) 2015-2018 Shi ChaoHui
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="sch_get_camera_service_failed">获取相机服务失败</string>
+    <string name="sch_no_camera">没有找到摄像头设备</string>
+    <string name="sch_camera_error">相机出现错误</string>
+    <string name="sch_get_camera_configuration_failed">读取相机属性失败</string>
+    <string name="sch_create_session_failed">创建相机预览失败</string>
+</resources>
