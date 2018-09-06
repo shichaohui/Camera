@@ -37,6 +37,11 @@ public interface ICameraManager {
     String PICTURE_TYPE = ".jpg";
     String VIDEO_TYPE = ".mp4";
 
+    int SENSOR_UP = 0;
+    int SENSOR_LEFT = 90;
+    int SENSOR_DOWN = 180;
+    int SENSOR_RIGHT = 270;
+
     /**
      * 恢复相机状态，在 Activity.onResume() 中调用。
      */

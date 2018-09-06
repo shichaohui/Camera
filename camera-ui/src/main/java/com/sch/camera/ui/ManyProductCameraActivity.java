@@ -75,6 +75,8 @@ public class ManyProductCameraActivity extends BaseCameraActivity implements Pro
 
         mProductSelectDialog = new ProductSelectDialog(this, mOptions.getMaxProductCount(), this);
 
+        addRotatableView(findViewById(R.id.layout_product_thumb));
+
         tvCount = findViewById(R.id.tv_count);
 
         ivVideoLogo = findViewById(R.id.iv_video_logo);

@@ -36,6 +36,7 @@ import com.sch.camera.DefOptions;
 import com.sch.camera.Size;
 import com.sch.camera.annotation.Facing;
 import com.sch.camera.annotation.Flash;
+import com.sch.camera.annotation.SensorDegrees;
 import com.sch.camera.listener.OnCameraListener;
 import com.sch.camera.listener.OnPictureListener;
 import com.sch.camera.listener.OnVideoListener;
@@ -124,7 +125,8 @@ abstract class BaseCameraManager implements ICameraManager, SensorEventListener,
     /**
      * 传感器角度。
      */
-    int mSensorDegrees = 0;
+    @SensorDegrees
+    int mSensorDegrees = SENSOR_UP;
 
     /**
      * 初始化。
@@ -212,22 +214,24 @@ abstract class BaseCameraManager implements ICameraManager, SensorEventListener,
             if (sensorEvent.sensor.getType() != Sensor.TYPE_ACCELEROMETER) {
                 return;
             }
-            if (sensorEvent.values[0] < 4 && sensorEvent.values[0] > -4) {
-                if (sensorEvent.values[1] > 0) {
-                    // UP
-                    mSensorDegrees = 0;
-                } else if (sensorEvent.values[1] < 0) {
-                    // UP SIDE DOWN
-                    mSensorDegrees = 180;
+            final int oldDegrees = mSensorDegrees;
+            float minXY = -1.5F, maxXY = 1.5F;
+            float x = sensorEvent.values[0], y = sensorEvent.values[1];
+            if (x < maxXY && x > minXY) {
+                if (y > maxXY) {
+                    mSensorDegrees = SENSOR_UP;
+                } else if (y < minXY) {
+                    mSensorDegrees = SENSOR_DOWN;
                 }
-            } else if (sensorEvent.values[1] < 4 && sensorEvent.values[1] > -4) {
-                if (sensorEvent.values[0] > 0) {
-                    // LEFT
-                    mSensorDegrees = 90;
-                } else if (sensorEvent.values[0] < 0) {
-                    // RIGHT
-                    mSensorDegrees = 270;
+            } else if (y < maxXY && y > minXY) {
+                if (x > maxXY) {
+                    mSensorDegrees = SENSOR_LEFT;
+                } else if (x < minXY) {
+                    mSensorDegrees = SENSOR_RIGHT;
                 }
+            }
+            if (mSensorDegrees != oldDegrees) {
+                mOnCameraListener.onSensorChanged(oldDegrees, mSensorDegrees);
             }
         }
     }

@@ -33,7 +33,7 @@ import android.widget.Toast;
 
 import com.sch.camera.DefOptions;
 import com.sch.camera.annotation.Facing;
-import com.sch.camera.listener.OnCameraListener;
+import com.sch.camera.listener.OnCameraListenerAdapter;
 import com.sch.camera.listener.OnPictureListener;
 import com.sch.camera.listener.OnVideoListener;
 import com.sch.camera.manager.Camera2Manager;
@@ -45,6 +45,7 @@ import com.sch.camera.ui.widget.MagicButton;
 import com.sch.camera.widget.AutoFitTextureView;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -84,6 +85,9 @@ public abstract class BaseCameraActivity extends Activity implements OnPictureLi
     private MagicButton mbCapture;
     private ImageButton ibtnFlash;
     private ImageButton ibtnSwitchCamera;
+    private ImageButton ibtnGoBack;
+
+    private List<View> rotatableViewList = new ArrayList<>();
 
     /**
      * 配置项
@@ -145,7 +149,8 @@ public abstract class BaseCameraActivity extends Activity implements OnPictureLi
     private void initView() {
         setContentView(getContentViewResId());
 
-        findViewById(R.id.ibtn_go_back).setOnClickListener(new View.OnClickListener() {
+        ibtnGoBack = findViewById(R.id.ibtn_go_back);
+        ibtnGoBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
@@ -247,6 +252,11 @@ public abstract class BaseCameraActivity extends Activity implements OnPictureLi
             default:
                 break;
         }
+
+        addRotatableView(ibtnFlash);
+        addRotatableView(ibtnSwitchCamera);
+        addRotatableView(ibtnGoBack);
+        addRotatableView(mbCapture);
     }
 
     /**
@@ -328,12 +338,17 @@ public abstract class BaseCameraActivity extends Activity implements OnPictureLi
         } else {
             mCameraManager = new CameraManager(this, autoFitTextureView, mOptions);
         }
-        mCameraManager.setOnCameraListener(new OnCameraListener() {
+        mCameraManager.setOnCameraListener(new OnCameraListenerAdapter() {
 
             @Override
             public void onFlashSupport(boolean isSupport) {
                 // 是否支持闪光灯
                 ibtnFlash.setVisibility(isSupport ? View.VISIBLE : View.GONE);
+            }
+
+            @Override
+            public void onSensorChanged(int oldDegrees, int newDegrees) {
+                rotatingView(oldDegrees, newDegrees);
             }
 
             @Override
@@ -411,6 +426,35 @@ public abstract class BaseCameraActivity extends Activity implements OnPictureLi
         float x = event.getX(0) - event.getX(1);
         float y = event.getY(0) - event.getY(1);
         return (float) Math.sqrt(x * x + y * y);
+    }
+
+    /**
+     * 添加根据屏幕方向旋转的视图。
+     */
+    protected void addRotatableView(View view) {
+        rotatableViewList.add(view);
+    }
+
+    /**
+     * 旋转视图。
+     *
+     * @param oldDegrees 改变前的角度。
+     * @param newDegrees 改变后的角度。
+     */
+    protected void rotatingView(int oldDegrees, int newDegrees) {
+
+        if (oldDegrees == ICameraManager.SENSOR_UP && newDegrees == ICameraManager.SENSOR_RIGHT) {
+            oldDegrees = 360;
+        } else if (oldDegrees == ICameraManager.SENSOR_RIGHT && newDegrees == ICameraManager.SENSOR_UP) {
+            newDegrees = 360;
+        }
+
+        int targetDegrees = newDegrees - oldDegrees;
+
+        for (final View view : rotatableViewList) {
+            view.setRotation(oldDegrees);
+            view.animate().rotationBy(targetDegrees).setDuration(300L);
+        }
     }
 
     /**

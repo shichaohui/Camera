@@ -16,6 +16,8 @@
 
 package com.sch.camera.listener;
 
+import com.sch.camera.annotation.SensorDegrees;
+
 /**
  * Created by StoneHui on 2018/8/8.
  * <p>
@@ -29,6 +31,14 @@ public interface OnCameraListener {
      * @param isSupport 是否支持闪光灯。
      */
     void onFlashSupport(boolean isSupport);
+
+    /**
+     * 传感器角度改变。
+     *
+     * @param oldDegrees 改变前的角度。
+     * @param newDegrees 改变后的角度。
+     */
+    void onSensorChanged(@SensorDegrees int oldDegrees, @SensorDegrees int newDegrees);
 
     /**
      * 相机出错。

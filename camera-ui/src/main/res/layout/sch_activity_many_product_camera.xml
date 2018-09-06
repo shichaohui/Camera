@@ -25,6 +25,7 @@
     <include layout="@layout/sch_layout_camera_preview"/>
 
     <FrameLayout
+        android:id="@+id/layout_product_thumb"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
