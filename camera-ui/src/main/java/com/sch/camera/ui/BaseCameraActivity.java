@@ -29,7 +29,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.sch.camera.DefOptions;
@@ -82,10 +81,9 @@ public abstract class BaseCameraActivity extends Activity implements OnPictureLi
      */
     protected AutoFitTextureView autoFitTextureView;
     protected FocusView focusView;
-    private MagicButton mbRecord;
+    private MagicButton mbCapture;
     private ImageButton ibtnFlash;
     private ImageButton ibtnSwitchCamera;
-    private TextView tvMagicPrompt;
 
     /**
      * 配置项
@@ -134,7 +132,7 @@ public abstract class BaseCameraActivity extends Activity implements OnPictureLi
 
         super.onCreate(savedInstanceState);
 
-        getOptions();
+        initOptions();
 
         initView();
 
@@ -196,9 +194,9 @@ public abstract class BaseCameraActivity extends Activity implements OnPictureLi
         });
 
         // 拍照及录像
-        mbRecord = findViewById(R.id.mb_record);
-        mbRecord.setMaxLongClickTime(mOptions.getMaxVideoRecordTime());
-        mbRecord.setOnMagicClickedListener(new MagicButton.OnMagicClickedListener() {
+        mbCapture = findViewById(R.id.mb_record);
+        mbCapture.setMaxLongClickTime(mOptions.getMaxVideoRecordTime());
+        mbCapture.setOnMagicClickedListener(new MagicButton.OnMagicClickedListener() {
             @Override
             public void onClicked() {
                 mCameraManager.takePicture();
@@ -212,7 +210,7 @@ public abstract class BaseCameraActivity extends Activity implements OnPictureLi
                     mCameraManager.startVideoRecord();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    mbRecord.cancel();
+                    mbCapture.cancel();
                     toast(getString(R.string.sch_start_video_record_failed));
                 }
             }
@@ -233,19 +231,18 @@ public abstract class BaseCameraActivity extends Activity implements OnPictureLi
         });
 
         // 按钮操作提示。
-        tvMagicPrompt = findViewById(R.id.tv_magic_prompt);
         switch (mOptions.getCameraMode()) {
             case Camera.Options.CAMERA_MODE_BOTH:
-                tvMagicPrompt.setText(String.format("%s，%s", getString(R.string.sch_click_4_picture),
+                mbCapture.setText(String.format("%s %s", getString(R.string.sch_click_4_picture),
                         getString(R.string.sch_long_click_4_video_record)));
                 break;
             case Camera.Options.CAMERA_MODE_PICTURE:
-                tvMagicPrompt.setText(getString(R.string.sch_click_4_picture));
-                mbRecord.setLongClickable(false);
+                mbCapture.setText(getString(R.string.sch_click_4_picture));
+                mbCapture.setLongClickable(false);
                 break;
             case Camera.Options.CAMERA_MODE_VIDEO:
-                tvMagicPrompt.setText(getString(R.string.sch_long_click_4_video_record));
-                mbRecord.setClickable(false);
+                mbCapture.setText(getString(R.string.sch_long_click_4_video_record));
+                mbCapture.setClickable(false);
                 break;
             default:
                 break;
@@ -255,7 +252,7 @@ public abstract class BaseCameraActivity extends Activity implements OnPictureLi
     /**
      * 获取配置项。
      */
-    private void getOptions() {
+    private void initOptions() {
         mOptions = (Camera.Options) getIntent().getSerializableExtra(INTENT_KEY_OPTIONS);
 
         mFacing = mOptions.getFacing();

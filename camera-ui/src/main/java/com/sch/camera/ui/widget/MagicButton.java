@@ -23,6 +23,8 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -66,7 +68,8 @@ public class MagicButton extends View implements Runnable {
 
     private float backCircleX, backCircleY, backCircleRadius, backCircleMinRadius, backCircleMaxRadius;
     private float frontCircleX, frontCircleY, frontCircleRadius, frontCircleMinRadius, frontCircleMaxRadius;
-    private RectF mRectF;
+    private RectF mBackCircleRectF;
+    private Path mTextPath;
 
     private AnimatorSet zoomAnimSet;
     private ValueAnimator timeAnim;
@@ -79,6 +82,8 @@ public class MagicButton extends View implements Runnable {
     private Handler mHandler = new Handler();
 
     private OnMagicClickedListener mOnMagicClickedListener;
+
+    private String text;
 
     public MagicButton(Context context) {
         this(context, null);
@@ -115,6 +120,16 @@ public class MagicButton extends View implements Runnable {
      */
     public void setOnMagicClickedListener(OnMagicClickedListener listener) {
         this.mOnMagicClickedListener = listener;
+    }
+
+    /**
+     * 设置文本。
+     *
+     * @param text 文本。
+     */
+    public void setText(String text) {
+        this.text = text;
+        postInvalidate();
     }
 
     /**
@@ -169,11 +184,21 @@ public class MagicButton extends View implements Runnable {
         frontCircleRadius = frontCircleMaxRadius = Math.min(w, h) / 8f * 2.5f;
 
         mPaint.setStrokeWidth(backCircleRadius / 8);
+        mPaint.setTextSize((int) (12 * getResources().getDisplayMetrics().scaledDensity + 0.5f));
 
-        mRectF = new RectF(backCircleX - backCircleMaxRadius + mPaint.getStrokeWidth() / 2,
+        mBackCircleRectF = new RectF(backCircleX - backCircleMaxRadius + mPaint.getStrokeWidth() / 2,
                 backCircleY - backCircleMaxRadius + mPaint.getStrokeWidth() / 2,
                 backCircleX + backCircleMaxRadius - mPaint.getStrokeWidth() / 2,
                 backCircleY + backCircleMaxRadius - mPaint.getStrokeWidth() / 2);
+
+        mTextPath = new Path();
+        Rect textBounds = new Rect();
+        mPaint.getTextBounds(text, 0, text.length(), textBounds);
+        RectF textRectF = new RectF(textBounds.height(), textBounds.height(),
+                w - textBounds.height(), h - textBounds.height());
+        // angle = arcLength / (2 * PI * radius ) * 360
+        float angle = (float) (textBounds.width() / Math.PI / (Math.min(w, h) - textBounds.height() * 2) * 360F);
+        mTextPath.addArc(textRectF, 270 - angle / 2, angle);
     }
 
     @Override
@@ -181,6 +206,9 @@ public class MagicButton extends View implements Runnable {
         canvas.drawColor(Color.TRANSPARENT);
 
         mPaint.setStyle(Paint.Style.FILL);
+
+        mPaint.setColor(Color.WHITE);
+        canvas.drawTextOnPath(text, mTextPath, 0, 0, mPaint);
 
         // 绘制背景圆。
         mPaint.setColor(Color.LTGRAY);
@@ -194,7 +222,7 @@ public class MagicButton extends View implements Runnable {
             // 绘制时间。
             mPaint.setStyle(Paint.Style.STROKE);
             mPaint.setColor(Color.GREEN);
-            canvas.drawArc(mRectF,
+            canvas.drawArc(mBackCircleRectF,
                     270, 360 * longClickTime / maxLongClickTime,
                     false, mPaint);
         }

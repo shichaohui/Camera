@@ -62,14 +62,6 @@
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/tv_magic_prompt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@id/mb_record"
-        android:layout_centerHorizontal="true"
-        android:textColor="@android:color/white"/>
-
     <com.sch.camera.ui.widget.MagicButton
         android:id="@+id/mb_record"
         android:layout_width="100dp"
