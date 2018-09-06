@@ -17,7 +17,7 @@
 ### Gradle 依赖
 
 ```
-implementation 'com.sch.camera:camera:1.0.0'
+implementation 'com.sch.camera:camera:1.0.1'
 ```
 
 ### API
@@ -43,12 +43,17 @@ if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP &&
 
 ```
 // 设置相机监听
-mCameraManager.setOnCameraListener(new OnCameraListener() {
+mCameraManager.setOnCameraListener(new OnCameraListenerAdapter() {
 
     @Override
     public void onFlashSupport(boolean isSupport) {
         // 是否支持闪光灯
         ibtnFlash.setVisibility(isSupport ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public void onSensorChanged(int oldDegrees, int newDegrees) {
+        // TODO 旋转视图。
     }
 
     @Override

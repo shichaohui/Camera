@@ -49,7 +49,7 @@ publish {
     userOrg = 'shichaohui'
     groupId = 'com.sch.camera'
     artifactId = 'camera'
-    publishVersion = '1.0.0'
+    publishVersion = '1.0.1'
     desc = 'Based on Camera and Camera2. Support flash, focus, zoom, switch camera, photo, video, default UI, etc.'
     website = 'https://github.com/shichaohui/Camera.git'
 }
