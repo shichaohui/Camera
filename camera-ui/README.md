@@ -23,7 +23,7 @@
 
 ```
 implementation 'com.sch.camera:camera:1.0.1'
-implementation 'com.sch.camera:camera-ui:1.0.1'
+implementation 'com.sch.camera:camera-ui:1.0.2'
 ```
 
 ### 相机配置
