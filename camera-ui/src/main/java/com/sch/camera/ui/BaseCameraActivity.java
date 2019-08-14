@@ -47,6 +47,7 @@ import com.sch.camera.widget.AutoFitTextureView;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -153,7 +154,7 @@ public abstract class BaseCameraActivity extends Activity implements OnPictureLi
         ibtnGoBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                finish();
+                onBackPressed();
             }
         });
 
@@ -286,6 +287,12 @@ public abstract class BaseCameraActivity extends Activity implements OnPictureLi
         if (mCameraManager != null) {
             mCameraManager.onPause();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        sCallback.callback(new ArrayList<String>());
+        super.onBackPressed();
     }
 
     @Override
