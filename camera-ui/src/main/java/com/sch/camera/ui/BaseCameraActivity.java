@@ -47,7 +47,6 @@ import com.sch.camera.widget.AutoFitTextureView;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -68,7 +67,10 @@ public abstract class BaseCameraActivity extends Activity implements OnPictureLi
      * 权限
      */
     private final int permissionRequestCode = 103;
-    private final String[] permissionArray = new String[]{
+    private final String[] permissionArray4Picture = new String[]{
+            Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE
+    };
+    private final String[] permissionArray4Video = new String[]{
             Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
 
@@ -154,7 +156,7 @@ public abstract class BaseCameraActivity extends Activity implements OnPictureLi
         ibtnGoBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                onBackPressed();
+                finish();
             }
         });
 
@@ -290,13 +292,8 @@ public abstract class BaseCameraActivity extends Activity implements OnPictureLi
     }
 
     @Override
-    public void onBackPressed() {
-        sCallback.callback(new ArrayList<String>());
-        super.onBackPressed();
-    }
-
-    @Override
     public void finish() {
+        sCallback.callback(new ArrayList<String>());
         sCallback = null;
         super.finish();
     }
@@ -323,6 +320,17 @@ public abstract class BaseCameraActivity extends Activity implements OnPictureLi
     protected boolean requestCameraPermission() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
             return true;
+        }
+        String[] permissionArray;
+        switch (mOptions.getCameraMode()) {
+            case Camera.Options.CAMERA_MODE_BOTH:
+            case Camera.Options.CAMERA_MODE_VIDEO:
+                permissionArray = permissionArray4Video;
+                break;
+            case Camera.Options.CAMERA_MODE_PICTURE:
+            default:
+                permissionArray = permissionArray4Picture;
+                break;
         }
         for (String permission : permissionArray) {
             if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
