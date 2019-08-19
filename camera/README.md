@@ -17,7 +17,7 @@
 ### Gradle 依赖
 
 ```
-implementation 'com.sch.camera:camera:1.0.2'
+implementation 'com.sch.camera:camera:1.0.3'
 ```
 
 ### API
