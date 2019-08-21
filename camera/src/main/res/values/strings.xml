@@ -15,9 +15,6 @@
   -->
 
 <resources>
-    <string name="sch_get_camera_service_failed">获取相机服务失败</string>
+    <string name="sch_camera_disable">无法使用相机</string>
     <string name="sch_no_camera">没有找到摄像头设备</string>
-    <string name="sch_camera_error">相机出现错误</string>
-    <string name="sch_get_camera_configuration_failed">读取相机属性失败</string>
-    <string name="sch_create_session_failed">创建相机预览失败</string>
 </resources>

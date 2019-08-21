@@ -178,7 +178,7 @@ public class CameraManager extends BaseCameraManager {
         } catch (Exception e) {
             e.printStackTrace();
             if (mOnCameraListener != null) {
-                mOnCameraListener.onError(new RuntimeException(mActivity.getString(R.string.sch_create_session_failed)));
+                mOnCameraListener.onError(new RuntimeException(mActivity.getString(R.string.sch_camera_disable)));
             }
         }
     }

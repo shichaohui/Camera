@@ -228,7 +228,7 @@ public class Camera2Manager extends BaseCameraManager implements ImageReader.OnI
         super(activity, autoFitTextureView, options, onCameraListener);
         mCameraManager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
         if (mCameraManager == null && mOnCameraListener != null) {
-            mOnCameraListener.onError(new RuntimeException(mActivity.getString(R.string.sch_get_camera_service_failed)));
+            mOnCameraListener.onError(new RuntimeException(mActivity.getString(R.string.sch_camera_disable)));
             return;
         }
         try {
@@ -301,13 +301,16 @@ public class Camera2Manager extends BaseCameraManager implements ImageReader.OnI
                     cameraDevice.close();
                     mCameraDevice = null;
                     if (mOnCameraListener != null) {
-                        mOnCameraListener.onError(new RuntimeException(mActivity.getString(R.string.sch_camera_error)));
+                        mOnCameraListener.onError(new RuntimeException(mActivity.getString(R.string.sch_camera_disable)));
                     }
                 }
 
             }, mBackgroundHandler);
-        } catch (CameraAccessException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+            if (mOnCameraListener != null) {
+                mOnCameraListener.onError(new RuntimeException(mActivity.getString(R.string.sch_camera_disable)));
+            }
         }
     }
 
@@ -521,43 +524,39 @@ public class Camera2Manager extends BaseCameraManager implements ImageReader.OnI
     /**
      * 设置相机相关的成员变量。
      */
-    private void setUpCameraOutputs() {
-        try {
-            mCameraCharacteristics = mCameraManager.getCameraCharacteristics(mCameraId);
+    private void setUpCameraOutputs() throws Exception {
 
-            StreamConfigurationMap map = mCameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-            if (map == null) {
-                if (mOnCameraListener != null) {
-                    mOnCameraListener.onError(new RuntimeException(mActivity.getString(R.string.sch_get_camera_configuration_failed)));
-                }
-                return;
+        mCameraCharacteristics = mCameraManager.getCameraCharacteristics(mCameraId);
+
+        StreamConfigurationMap map = mCameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+        if (map == null) {
+            if (mOnCameraListener != null) {
+                mOnCameraListener.onError(new RuntimeException(mActivity.getString(R.string.sch_camera_disable)));
             }
-
-            mPreviewSize = getOptimalSize(Size.convert(map.getOutputSizes(SurfaceTexture.class)),
-                    MAX_PREVIEW_WIDTH, MAX_PREVIEW_HEIGHT);
-
-            mImageReader = ImageReader.newInstance(mPreviewSize.getWidth(), mPreviewSize.getHeight(), ImageFormat.JPEG, 9);
-            mImageReader.setOnImageAvailableListener(this, mBackgroundHandler);
-
-            // 将 TextureView 的纵横比与我们选择的预览大小相匹配。
-            if (mActivity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                mAutoFitTextureView.setAspectRatio(mPreviewSize.getWidth(), mPreviewSize.getHeight());
-            } else {
-                mAutoFitTextureView.setAspectRatio(mPreviewSize.getHeight(), mPreviewSize.getWidth());
-            }
-
-            // 检查是否支持闪光灯。
-            Boolean available = mCameraCharacteristics.get(CameraCharacteristics.FLASH_INFO_AVAILABLE);
-            setFlashSupport(available == null ? false : available);
-
-            // 检查是否支持调焦。
-            int[] afModes = mCameraCharacteristics.get(CameraCharacteristics.CONTROL_AF_AVAILABLE_MODES);
-            setAfAvailable(!(afModes == null || afModes.length == 0 ||
-                    (afModes.length == 1 && afModes[0] == CameraCharacteristics.CONTROL_AF_MODE_OFF)));
-
-        } catch (CameraAccessException e) {
-            e.printStackTrace();
+            return;
         }
+
+        mPreviewSize = getOptimalSize(Size.convert(map.getOutputSizes(SurfaceTexture.class)),
+                MAX_PREVIEW_WIDTH, MAX_PREVIEW_HEIGHT);
+
+        mImageReader = ImageReader.newInstance(mPreviewSize.getWidth(), mPreviewSize.getHeight(), ImageFormat.JPEG, 9);
+        mImageReader.setOnImageAvailableListener(this, mBackgroundHandler);
+
+        // 将 TextureView 的纵横比与我们选择的预览大小相匹配。
+        if (mActivity.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mAutoFitTextureView.setAspectRatio(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+        } else {
+            mAutoFitTextureView.setAspectRatio(mPreviewSize.getHeight(), mPreviewSize.getWidth());
+        }
+
+        // 检查是否支持闪光灯。
+        Boolean available = mCameraCharacteristics.get(CameraCharacteristics.FLASH_INFO_AVAILABLE);
+        setFlashSupport(available == null ? false : available);
+
+        // 检查是否支持调焦。
+        int[] afModes = mCameraCharacteristics.get(CameraCharacteristics.CONTROL_AF_AVAILABLE_MODES);
+        setAfAvailable(!(afModes == null || afModes.length == 0 ||
+                (afModes.length == 1 && afModes[0] == CameraCharacteristics.CONTROL_AF_MODE_OFF)));
 
     }
 
@@ -605,7 +604,7 @@ public class Camera2Manager extends BaseCameraManager implements ImageReader.OnI
                         @Override
                         public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
                             if (mOnCameraListener != null) {
-                                mOnCameraListener.onError(new RuntimeException(mActivity.getString(R.string.sch_create_session_failed)));
+                                mOnCameraListener.onError(new RuntimeException(mActivity.getString(R.string.sch_camera_disable)));
                             }
                         }
                     }, mBackgroundHandler);
