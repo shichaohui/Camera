@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements Camera.Callback {
         // 设置最大的视频录制时长，默认 10 * 1000L。
         options.setMaxVideoRecordTime(10 * 1000L);
         // 设置是否仅使用旧版 API ，默认 false。
-        options.setOnlyOldApi(false);
+        options.setOnlyOldApi(true);
         // 设置是否自动对焦, 默认 true。
         options.setAutoFocus(true);
         // 设置相机方向, 默认 FACING_BACK。

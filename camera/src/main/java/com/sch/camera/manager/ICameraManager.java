@@ -20,12 +20,12 @@ import android.view.MotionEvent;
 
 import com.sch.camera.annotation.Facing;
 import com.sch.camera.annotation.Flash;
-import com.sch.camera.listener.OnCameraListener;
 import com.sch.camera.listener.OnPictureListener;
 import com.sch.camera.listener.OnVideoListener;
 import com.sch.camera.widget.AutoFitTextureView;
 
 import java.io.IOException;
+import java.lang.Exception;
 
 /**
  * Created by StoneHui on 2018/8/7.
@@ -97,13 +97,6 @@ public interface ICameraManager {
      * @throws Exception MediaRecorder.stop() 可能抛出异常。
      */
     void stopVideoRecord() throws Exception;
-
-    /**
-     * 设置相机监听器。
-     *
-     * @param listener 相机监听器。
-     */
-    void setOnCameraListener(OnCameraListener listener);
 
     /**
      * 设置拍照监听器。

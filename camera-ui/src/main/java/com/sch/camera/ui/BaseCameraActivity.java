@@ -33,6 +33,7 @@ import android.widget.Toast;
 
 import com.sch.camera.DefOptions;
 import com.sch.camera.annotation.Facing;
+import com.sch.camera.listener.OnCameraListener;
 import com.sch.camera.listener.OnCameraListenerAdapter;
 import com.sch.camera.listener.OnPictureListener;
 import com.sch.camera.listener.OnVideoListener;
@@ -345,15 +346,7 @@ public abstract class BaseCameraActivity extends Activity implements OnPictureLi
      * 初始化相机。
      */
     private void initCameraManager() {
-        if (mOptions.isOnlyOldApi()) {
-            mCameraManager = new CameraManager(this, autoFitTextureView, mOptions);
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP &&
-                Camera2Manager.isSupported(this, mOptions.getFacing())) {
-            mCameraManager = new Camera2Manager(this, autoFitTextureView, mOptions);
-        } else {
-            mCameraManager = new CameraManager(this, autoFitTextureView, mOptions);
-        }
-        mCameraManager.setOnCameraListener(new OnCameraListenerAdapter() {
+        OnCameraListener onCameraListener = new OnCameraListenerAdapter() {
 
             @Override
             public void onFlashSupport(boolean isSupport) {
@@ -371,7 +364,15 @@ public abstract class BaseCameraActivity extends Activity implements OnPictureLi
                 toast(e.getMessage());
                 finish();
             }
-        });
+        };
+        if (mOptions.isOnlyOldApi()) {
+            mCameraManager = new CameraManager(this, autoFitTextureView, mOptions, onCameraListener);
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP &&
+                Camera2Manager.isSupported(this, mOptions.getFacing())) {
+            mCameraManager = new Camera2Manager(this, autoFitTextureView, mOptions, onCameraListener);
+        } else {
+            mCameraManager = new CameraManager(this, autoFitTextureView, mOptions, onCameraListener);
+        }
         mCameraManager.setOnPictureListener(this);
         mCameraManager.setOnVideoListener(this);
     }

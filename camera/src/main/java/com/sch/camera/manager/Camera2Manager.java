@@ -40,6 +40,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.util.SparseIntArray;
 import android.view.MotionEvent;
@@ -52,6 +53,7 @@ import com.sch.camera.Size;
 import com.sch.camera.VideoRecorder;
 import com.sch.camera.annotation.Facing;
 import com.sch.camera.annotation.Flash;
+import com.sch.camera.listener.OnCameraListener;
 import com.sch.camera.widget.AutoFitTextureView;
 
 import java.io.IOException;
@@ -210,7 +212,7 @@ public class Camera2Manager extends BaseCameraManager implements ImageReader.OnI
      * @param autoFitTextureView 显示预览的 AutoFitTextureView。
      */
     public Camera2Manager(@NonNull Activity activity, @NonNull AutoFitTextureView autoFitTextureView) {
-        this(activity, autoFitTextureView, new DefOptions());
+        this(activity, autoFitTextureView, new DefOptions(), null);
     }
 
     /**
@@ -219,20 +221,23 @@ public class Camera2Manager extends BaseCameraManager implements ImageReader.OnI
      * @param activity           Activity。
      * @param autoFitTextureView 显示预览的 AutoFitTextureView。
      * @param options            配置项。
+     * @param onCameraListener   相机监听
      */
-    public Camera2Manager(@NonNull Activity activity, @NonNull AutoFitTextureView autoFitTextureView, @NonNull DefOptions options) {
-        super(activity, autoFitTextureView, options);
+    public Camera2Manager(@NonNull Activity activity, @NonNull AutoFitTextureView autoFitTextureView,
+                          @NonNull DefOptions options, @Nullable OnCameraListener onCameraListener) {
+        super(activity, autoFitTextureView, options, onCameraListener);
         mCameraManager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
-        if (mCameraManager == null) {
+        if (mCameraManager == null && mOnCameraListener != null) {
             mOnCameraListener.onError(new RuntimeException(mActivity.getString(R.string.sch_get_camera_service_failed)));
             return;
         }
         try {
+            assert mCameraManager != null;
             mCameraIdList = Arrays.asList(mCameraManager.getCameraIdList());
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
-        if (mCameraIdList.isEmpty()) {
+        if (mCameraIdList.isEmpty() && mOnCameraListener != null) {
             mOnCameraListener.onError(new RuntimeException(activity.getString(R.string.sch_no_camera)));
             return;
         }
@@ -295,7 +300,9 @@ public class Camera2Manager extends BaseCameraManager implements ImageReader.OnI
                 public void onError(@NonNull CameraDevice cameraDevice, int error) {
                     cameraDevice.close();
                     mCameraDevice = null;
-                    mOnCameraListener.onError(new RuntimeException(mActivity.getString(R.string.sch_camera_error)));
+                    if (mOnCameraListener != null) {
+                        mOnCameraListener.onError(new RuntimeException(mActivity.getString(R.string.sch_camera_error)));
+                    }
                 }
 
             }, mBackgroundHandler);
@@ -520,7 +527,9 @@ public class Camera2Manager extends BaseCameraManager implements ImageReader.OnI
 
             StreamConfigurationMap map = mCameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             if (map == null) {
-                mOnCameraListener.onError(new RuntimeException(mActivity.getString(R.string.sch_get_camera_configuration_failed)));
+                if (mOnCameraListener != null) {
+                    mOnCameraListener.onError(new RuntimeException(mActivity.getString(R.string.sch_get_camera_configuration_failed)));
+                }
                 return;
             }
 
@@ -595,7 +604,9 @@ public class Camera2Manager extends BaseCameraManager implements ImageReader.OnI
 
                         @Override
                         public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
-                            mOnCameraListener.onError(new RuntimeException(mActivity.getString(R.string.sch_create_session_failed)));
+                            if (mOnCameraListener != null) {
+                                mOnCameraListener.onError(new RuntimeException(mActivity.getString(R.string.sch_create_session_failed)));
+                            }
                         }
                     }, mBackgroundHandler);
         } catch (CameraAccessException e) {

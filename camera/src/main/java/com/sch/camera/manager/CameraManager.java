@@ -21,6 +21,7 @@ import android.graphics.Rect;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.MotionEvent;
 
 import com.sch.camera.DefOptions;
@@ -30,6 +31,7 @@ import com.sch.camera.Size;
 import com.sch.camera.VideoRecorder;
 import com.sch.camera.annotation.Facing;
 import com.sch.camera.annotation.Flash;
+import com.sch.camera.listener.OnCameraListener;
 import com.sch.camera.widget.AutoFitTextureView;
 
 import java.io.IOException;
@@ -83,7 +85,7 @@ public class CameraManager extends BaseCameraManager {
      * @param autoFitTextureView 显示预览的 AutoFitTextureView。
      */
     public CameraManager(@NonNull Activity activity, @NonNull AutoFitTextureView autoFitTextureView) {
-        super(activity, autoFitTextureView);
+        this(activity, autoFitTextureView, new DefOptions(), null);
     }
 
     /**
@@ -92,9 +94,17 @@ public class CameraManager extends BaseCameraManager {
      * @param activity           Activity。
      * @param autoFitTextureView 显示预览的 AutoFitTextureView。
      * @param options            配置项。
+     * @param onCameraListener   相机监听
      */
-    public CameraManager(@NonNull Activity activity, @NonNull AutoFitTextureView autoFitTextureView, @NonNull DefOptions options) {
-        super(activity, autoFitTextureView, options);
+    public CameraManager(@NonNull Activity activity, @NonNull AutoFitTextureView autoFitTextureView,
+                         @NonNull DefOptions options, @Nullable OnCameraListener onCameraListener) {
+        super(activity, autoFitTextureView, options, onCameraListener);
+        if (Camera.getNumberOfCameras() <= 0) {
+            if (mOnCameraListener != null) {
+                mOnCameraListener.onError(new RuntimeException(mActivity.getString(R.string.sch_no_camera)));
+            }
+            return;
+        }
     }
 
     @Override
@@ -165,9 +175,11 @@ public class CameraManager extends BaseCameraManager {
 
             // 开始预览。
             mCamera.startPreview();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
-            mOnCameraListener.onError(new RuntimeException(mActivity.getString(R.string.sch_create_session_failed)));
+            if (mOnCameraListener != null) {
+                mOnCameraListener.onError(new RuntimeException(mActivity.getString(R.string.sch_create_session_failed)));
+            }
         }
     }
 

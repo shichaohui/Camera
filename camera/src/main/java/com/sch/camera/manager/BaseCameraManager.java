@@ -29,6 +29,7 @@ import android.hardware.SensorManager;
 import android.media.ThumbnailUtils;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.Surface;
 import android.view.TextureView;
 
@@ -108,6 +109,7 @@ abstract class BaseCameraManager implements ICameraManager, SensorEventListener,
     /**
      * 相机监听器。
      */
+    @Nullable
     OnCameraListener mOnCameraListener;
     /**
      * 拍照监听器。
@@ -135,7 +137,7 @@ abstract class BaseCameraManager implements ICameraManager, SensorEventListener,
      * @param autoFitTextureView 显示预览的 AutoFitTextureView。
      */
     BaseCameraManager(@NonNull Activity activity, @NonNull AutoFitTextureView autoFitTextureView) {
-        this(activity, autoFitTextureView, new DefOptions());
+        this(activity, autoFitTextureView, new DefOptions(), null);
     }
 
     /**
@@ -144,13 +146,16 @@ abstract class BaseCameraManager implements ICameraManager, SensorEventListener,
      * @param activity           Activity。
      * @param autoFitTextureView 显示预览的 AutoFitTextureView。
      * @param options            配置项。
+     * @param onCameraListener   相机监听
      */
-    BaseCameraManager(@NonNull Activity activity, @NonNull AutoFitTextureView autoFitTextureView, @NonNull DefOptions options) {
+    BaseCameraManager(@NonNull Activity activity, @NonNull AutoFitTextureView autoFitTextureView,
+                      @NonNull DefOptions options, @Nullable OnCameraListener onCameraListener) {
         mActivity = activity;
         mAutoFitTextureView = autoFitTextureView;
         isAutoFocus = options.isAutoFocus();
         mFacing = options.getFacing();
         mFlash = options.getFlash();
+        this.mOnCameraListener = onCameraListener;
 
         mVideoFile = new File(activity.getExternalFilesDir(null), String.format("camera_video%s", VIDEO_TYPE));
         mPictureFile = new File(activity.getExternalFilesDir(null), String.format("camera_picture%s", PICTURE_TYPE));
@@ -180,11 +185,6 @@ abstract class BaseCameraManager implements ICameraManager, SensorEventListener,
         closeCamera();
         sensorManager.unregisterListener(this);
         mAutoFitTextureView.setSurfaceTextureListener(null);
-    }
-
-    @Override
-    public void setOnCameraListener(OnCameraListener listener) {
-        mOnCameraListener = listener;
     }
 
     @Override
@@ -230,7 +230,7 @@ abstract class BaseCameraManager implements ICameraManager, SensorEventListener,
                     mSensorDegrees = SENSOR_RIGHT;
                 }
             }
-            if (mSensorDegrees != oldDegrees) {
+            if (mSensorDegrees != oldDegrees && mOnCameraListener != null) {
                 mOnCameraListener.onSensorChanged(oldDegrees, mSensorDegrees);
             }
         }
@@ -318,7 +318,9 @@ abstract class BaseCameraManager implements ICameraManager, SensorEventListener,
      */
     void setFlashSupport(boolean flashSupport) {
         isFlashSupport = flashSupport;
-        mOnCameraListener.onFlashSupport(isFlashSupport);
+        if (mOnCameraListener != null) {
+            mOnCameraListener.onFlashSupport(isFlashSupport);
+        }
     }
 
     /**
