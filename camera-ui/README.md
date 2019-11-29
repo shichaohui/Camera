@@ -7,7 +7,7 @@
 * 切换摄像头。
 * 切换闪光灯状态。
 * 拍照(.jpg)。
-* 拍视频(.mp4)。
+* 拍视频(.mp4 格式的定时短视频、不限时长视频)。
 * 点击对焦。
 * 双指缩放预览内容。
 
@@ -22,8 +22,8 @@
 ### Gradle 依赖
 
 ```
-implementation 'com.sch.camera:camera:1.0.4'
-implementation 'com.sch.camera:camera-ui:1.0.4'
+implementation 'com.sch.camera:camera:1.0.5'
+implementation 'com.sch.camera:camera-ui:1.0.5'
 ```
 
 ### 相机配置

@@ -65,7 +65,7 @@ publish {
     userOrg = 'shichaohui'
     groupId = 'com.sch.camera'
     artifactId = 'camera-ui'
-    publishVersion = '1.0.4'
+    publishVersion = '1.0.5'
     desc = 'Based on custom CameraManager. Support flash, focus, zoom, switch camera, photo, video, default UI, etc.'
     website = 'https://github.com/shichaohui/Camera.git'
 }
