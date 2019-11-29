@@ -121,9 +121,13 @@ public class Camera {
          */
         public static final int CAMERA_MODE_PICTURE = 1;
         /**
-         * 相机模式，只能拍摄视频。
+         * 相机模式，只能拍摄指定时间长度的视频。
          */
         public static final int CAMERA_MODE_VIDEO = 2;
+        /**
+         * 相机模式，只能拍摄视频，但不限制拍摄的时间长度。
+         */
+        public static final int CAMERA_MODE_VIDEO_INFINITE = 3;
 
         /**
          * 是否仅使用旧版 API 。
@@ -210,7 +214,7 @@ public class Camera {
 
         @Retention(RetentionPolicy.SOURCE)
         @Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})
-        @IntDef({CAMERA_MODE_BOTH, CAMERA_MODE_PICTURE, CAMERA_MODE_VIDEO})
+        @IntDef({CAMERA_MODE_BOTH, CAMERA_MODE_PICTURE, CAMERA_MODE_VIDEO, CAMERA_MODE_VIDEO_INFINITE})
         @interface CameraMode {
         }
 

@@ -80,6 +80,16 @@ public class MainActivity extends AppCompatActivity implements Camera.Callback {
                 Camera.singleShot(MainActivity.this, options, MainActivity.this);
             }
         });
+
+        findViewById(R.id.btn_shot_one_video_infinite).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // 拍摄一个长视频。
+                options.setCameraMode(Camera.Options.CAMERA_MODE_VIDEO_INFINITE);
+                options.setMaxProductCount(1);
+                Camera.singleShot(MainActivity.this, options, MainActivity.this);
+            }
+        });
         findViewById(R.id.btn_shot_many).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

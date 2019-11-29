@@ -20,6 +20,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.LayoutRes;
@@ -208,34 +209,25 @@ public abstract class BaseCameraActivity extends Activity implements OnPictureLi
         mbCapture.setOnMagicClickedListener(new MagicButton.OnMagicClickedListener() {
             @Override
             public void onClicked() {
-                mCameraManager.takePicture();
+                if (mOptions.getCameraMode() == Camera.Options.CAMERA_MODE_VIDEO_INFINITE) {
+                    if (isVideoRecorder) {
+                        stopVideoRecord();
+                    } else {
+                        startVideoRecord();
+                    }
+                } else {
+                    takePicture();
+                }
             }
 
             @Override
             public void onLongClickStart() {
-                try {
-                    isVideoRecorder = true;
-                    switchFlash(mVideoFlash);
-                    mCameraManager.startVideoRecord();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    mbCapture.cancel();
-                    toast(getString(R.string.sch_start_video_record_failed));
-                }
+                startVideoRecord();
             }
 
             @Override
             public void onLongClickStop() {
-                try {
-                    isVideoRecorder = false;
-                    switchFlash(mFlash);
-                    mCameraManager.stopVideoRecord();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    if (mOptions.getCameraMode() == Camera.Options.CAMERA_MODE_BOTH) {
-                        mCameraManager.takePicture();
-                    }
-                }
+                stopVideoRecord();
             }
         });
 
@@ -252,6 +244,10 @@ public abstract class BaseCameraActivity extends Activity implements OnPictureLi
             case Camera.Options.CAMERA_MODE_VIDEO:
                 mbCapture.setText(getString(R.string.sch_long_click_4_video_record));
                 mbCapture.setClickable(false);
+                break;
+            case Camera.Options.CAMERA_MODE_VIDEO_INFINITE:
+                mbCapture.setTimer(true);
+                mbCapture.setText(getString(R.string.sch_click_4_video));
                 break;
             default:
                 break;
@@ -294,9 +290,13 @@ public abstract class BaseCameraActivity extends Activity implements OnPictureLi
 
     @Override
     public void finish() {
-        sCallback.callback(new ArrayList<String>());
-        sCallback = null;
-        super.finish();
+        if (isVideoRecorder) {
+            toast("请先结束视频录制");
+        } else {
+            sCallback.callback(new ArrayList<String>());
+            sCallback = null;
+            super.finish();
+        }
     }
 
     @Override
@@ -326,6 +326,7 @@ public abstract class BaseCameraActivity extends Activity implements OnPictureLi
         switch (mOptions.getCameraMode()) {
             case Camera.Options.CAMERA_MODE_BOTH:
             case Camera.Options.CAMERA_MODE_VIDEO:
+            case Camera.Options.CAMERA_MODE_VIDEO_INFINITE:
                 permissionArray = permissionArray4Video;
                 break;
             case Camera.Options.CAMERA_MODE_PICTURE:
@@ -375,6 +376,54 @@ public abstract class BaseCameraActivity extends Activity implements OnPictureLi
         }
         mCameraManager.setOnPictureListener(this);
         mCameraManager.setOnVideoListener(this);
+    }
+
+    /**
+     * 拍照
+     */
+    private void takePicture() {
+        mCameraManager.takePicture();
+    }
+
+    /**
+     * 开始拍视频
+     */
+    private void startVideoRecord() {
+        ibtnSwitchCamera.setEnabled(false);
+        ibtnSwitchCamera.setColorFilter(Color.GRAY);
+        ibtnGoBack.setEnabled(false);
+        ibtnGoBack.setColorFilter(Color.GRAY);
+
+        try {
+            isVideoRecorder = true;
+            switchFlash(mVideoFlash);
+            mCameraManager.startVideoRecord();
+        } catch (IOException e) {
+            e.printStackTrace();
+            mbCapture.cancel();
+            toast(getString(R.string.sch_start_video_record_failed));
+        }
+    }
+
+    /**
+     * 结束拍视频
+     */
+    private void stopVideoRecord() {
+        ibtnSwitchCamera.setEnabled(true);
+        ibtnSwitchCamera.setColorFilter(0);
+        ibtnGoBack.setEnabled(true);
+        ibtnGoBack.setColorFilter(0);
+
+        try {
+            isVideoRecorder = false;
+            switchFlash(mFlash);
+            mCameraManager.stopVideoRecord();
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (mOptions.getCameraMode() == Camera.Options.CAMERA_MODE_BOTH) {
+                mCameraManager.takePicture();
+            }
+        }
     }
 
     /**

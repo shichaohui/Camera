@@ -33,6 +33,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 
+import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
+
 /**
  * Created by StoneHui on 2018/8/7.
  * <p>
@@ -61,8 +65,19 @@ public class MagicButton extends View implements Runnable {
         void onLongClickStop();
     }
 
+    // 作为计时器时的计时颜色
+    private final int COLOR_TIMING = Color.parseColor("#FF4500");
+
     private long maxLongClickTime = 10 * 1000L;
     private float longClickTime;
+
+    // 本按钮作为计时器
+    private boolean isTimer = false;
+    private boolean isTiming = false;
+    private int time = 0;
+    private String timingText = "";
+    private Timer mTimer = new Timer();
+    private TimerTask mTimerTask;
 
     private Paint mPaint;
 
@@ -83,7 +98,7 @@ public class MagicButton extends View implements Runnable {
 
     private OnMagicClickedListener mOnMagicClickedListener;
 
-    private String text;
+    private String text = "";
 
     public MagicButton(Context context) {
         this(context, null);
@@ -123,12 +138,21 @@ public class MagicButton extends View implements Runnable {
     }
 
     /**
+     * 设置当前按钮是否作为计时器
+     */
+    public void setTimer(boolean isTimer) {
+        this.isTimer = isTimer;
+        setLongClickable(!isTimer);
+    }
+
+    /**
      * 设置文本。
      *
      * @param text 文本。
      */
     public void setText(String text) {
         this.text = text;
+        updateTextPath(getWidth(), getHeight());
         postInvalidate();
     }
 
@@ -191,6 +215,10 @@ public class MagicButton extends View implements Runnable {
                 backCircleX + backCircleMaxRadius - mPaint.getStrokeWidth() / 2,
                 backCircleY + backCircleMaxRadius - mPaint.getStrokeWidth() / 2);
 
+        updateTextPath(w, h);
+    }
+
+    private void updateTextPath(int w, int h) {
         mTextPath = new Path();
         Rect textBounds = new Rect();
         mPaint.getTextBounds(text, 0, text.length(), textBounds);
@@ -207,16 +235,29 @@ public class MagicButton extends View implements Runnable {
 
         mPaint.setStyle(Paint.Style.FILL);
 
-        mPaint.setColor(Color.WHITE);
-        canvas.drawTextOnPath(text, mTextPath, 0, 0, mPaint);
+        if (!isTiming) {
+            mPaint.setColor(Color.WHITE);
+            canvas.drawTextOnPath(text, mTextPath, 0, 0, mPaint);
+        }
 
         // 绘制背景圆。
         mPaint.setColor(Color.LTGRAY);
         canvas.drawCircle(backCircleX, backCircleY, backCircleRadius, mPaint);
 
         // 绘制前景圆。
-        mPaint.setColor(Color.WHITE);
+        mPaint.setColor(isTiming ? COLOR_TIMING : Color.WHITE);
         canvas.drawCircle(frontCircleX, frontCircleY, frontCircleRadius, mPaint);
+
+        if (isTiming) {
+            // 绘制计时
+            mPaint.setColor(Color.WHITE);
+            canvas.drawText(
+                    timingText,
+                    (getWidth() - mPaint.measureText(timingText)) / 2,
+                    (getHeight() - mPaint.ascent()) / 2,
+                    mPaint
+            );
+        }
 
         if (backCircleRadius == backCircleMaxRadius) {
             // 绘制时间。
@@ -248,6 +289,13 @@ public class MagicButton extends View implements Runnable {
      */
     private void onClicked() {
         mOnMagicClickedListener.onClicked();
+        if (isTimer) {
+            if (isTiming) {
+                stopTiming();
+            } else {
+                startTiming();
+            }
+        }
     }
 
     /**
@@ -271,6 +319,32 @@ public class MagicButton extends View implements Runnable {
                 mOnMagicClickedListener.onLongClickStop();
             }
         }, animDuration);
+    }
+
+    /**
+     * 开始计时
+     */
+    private void startTiming() {
+        isTiming=true;
+        time = 0;
+        mTimerTask = new TimerTask() {
+            @Override
+            public void run() {
+                time++;
+                timingText = String.format(Locale.getDefault(), "%02d:%02d", time / 60, time % 60);
+                postInvalidate();
+            }
+        };
+        mTimer.scheduleAtFixedRate(mTimerTask, 1000, 1000);
+    }
+
+    /**
+     * 停止计时
+     */
+    private void stopTiming() {
+        mTimerTask.cancel();
+        mTimerTask = null;
+        isTiming=false;
     }
 
     /**

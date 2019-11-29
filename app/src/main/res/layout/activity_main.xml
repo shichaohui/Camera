@@ -56,6 +56,16 @@
         app:layout_constraintTop_toTopOf="parent"/>
 
     <Button
+        android:id="@+id/btn_shot_one_video_infinite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="拍摄一个长视频"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <Button
         android:id="@+id/btn_shot_many"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -1,6 +1,7 @@
 <resources>
     <string name="sch_start_video_record_failed">启动录像失败</string>
     <string name="sch_click_4_picture">点击拍照</string>
+    <string name="sch_click_4_video">"点击拍摄"</string>
     <string name="sch_long_click_4_video_record">长按录像</string>
     <string name="sch_missing_permission">缺少权限，无法拍摄</string>
     <string name="sch_max_product_count">已达到最大数量</string>
